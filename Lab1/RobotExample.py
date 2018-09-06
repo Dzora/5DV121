@@ -2,12 +2,6 @@
 """
 Example demonstrating how to communicate with Microsoft Robotic Developer
 Studio 4 via the Lokarria http interface. 
-
-Author: Erik Billing (billing@cs.umu.se)
-
-Updated by Ola Ringdahl 2014-09-11
-Updated by Lennart Jern 2016-09-06 (converted to Python 3)
-Updated by Filip Allberg and Daniel Harr 2017-08-30 (actually converted to Python 3)
 """
 
 MRDS_URL = 'localhost:50000'
