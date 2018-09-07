@@ -20,6 +20,27 @@ class Point:
         """ Create a new point at the origin """
         self.x = 0
         self.y = 0
+        
+class Path:
+
+    def __init__(self):
+    # Load the path from a file and convert it into a list of coordinates
+        self.loadPath('Path-around-table-and-back.json')
+        self.vecPath = self.vectorizePath()
+    
+    def loadPath(self, file_name):
+    
+        with open(file_name) as path_file:
+            data = json.load(path_file)
+    
+        self.path = data
+    
+    def vectorizePath(self):
+        vecArray = [{'X': p['Pose']['Position']['X'], \
+                     'Y': p['Pose']['Position']['Y'], \
+                     'Z': p['Pose']['Position']['Z']}\
+                     for p in self.path]
+        return vecArray        
 
 def postSpeed(angularSpeed,linearSpeed):
     """Sends a speed command to the MRDS server"""
@@ -66,18 +87,6 @@ def getLaserAngles():
     else:
         raise UnexpectedResponse(response)
     
-def getDiffDrive():
-    """Reads the current speed from the MRDS"""
-    mrds = http.client.HTTPConnection(MRDS_URL)
-    mrds.request('GET','/lokarria/differentialdrive')
-    response = mrds.getresponse()
-    if (response.status == 200):
-        poseData = response.read()
-        response.close()
-        return json.loads(poseData.decode())
-    else:
-        return UnexpectedResponse(response)    
-
 def getPose():
     """Reads the current position and orientation from the MRDS"""
     mrds = http.client.HTTPConnection(MRDS_URL)
@@ -128,36 +137,67 @@ def getHeading():
     return heading(getPose()['Pose']['Orientation'])
 
 def calcSteeringAngle(destPoint, currentPoint):
+    print("---------------------------")
+    dict = {'steeringAngle': 0, 'hypotenuse': 0, 'fail': False}
     deltaX = destPoint.x - currentPoint.x
     deltaY = destPoint.y - currentPoint.y
     hypotenuse = sqrt((deltaX**2) + (deltaY**2))
-    print("Distance to target point: ", hypotenuse)
-    angleInRadians = acos(deltaY / hypotenuse)
-    return degrees(angleInRadians)
+    dict['hypotenuse'] = hypotenuse
+    if hypotenuse == 0 :
+        dict['fail'] = True
+        return dict
+    else:
+        print("Distance to target point: ", hypotenuse)
+        angleInRadians = acos(deltaY / hypotenuse)
+        print("Angle in radians: ", angleInRadians)
+        dict['angle'] = angleInRadians
+        return dict
     
+    
+def calcFacingAngle(facingPoint):
+    x = facingPoint.x
+    facingAngle = acos(x / 1)
+    return facingAngle
 
-def calcNextYPoint():
-    currentYPoint = getPose()["Pose"]["Position"]["Y"]
-    robotSpeed = 0.5
-    timeToRun = 2
-    nextXPoint = currentXPoint + (robotSpeed * timeToRun * cos(streeringAngle))
-    return nextYPoint
-
-def calcNextXPoint():
-    currentXPoint = getPose()["Pose"]["Position"]["X"]
-    robotSpeed = 0.5
-    timeToRun = 2
-    nextXPoint = currentXPoint + (robotSpeed * timeToRun * cos(streeringAngle))
-    return nextXPoint
+def calcAdjustAngle(facingAngle, steeringAngle):
+    diffAngle = (pi/2) - facingAngle
+    adjustAngle = diffAngle + steeringAngle
+    return adjustAngle
 
 if __name__ == '__main__':
     print('Sending commands to MRDS server', MRDS_URL)
     try:
+        path = Path()
         destPoint = Point()
-        destPoint.x = -5
-        destPoint.y = 6
         currentPoint = Point()
-        print("Angle in degrees: ", calcSteeringAngle(destPoint,currentPoint))
+        facingPoint = Point()
+        defaultSpeed = 0.5
+        
+        listLength = len(path.vecPath)
+        
+        for i in range(0, listLength-10, 10):
+            heading = getHeading()
+            pose = getPose()
+            currentPoint.x = pose['Pose']['Position']['X']
+            currentPoint.y = pose['Pose']['Position']['Y']
+            
+            destPoint.x = path.vecPath[i+10]["X"]
+            destPoint.y = path.vecPath[i+10]["Y"]
+            
+            dict = calcSteeringAngle(destPoint,currentPoint)
+            facingPoint.x = heading['X']
+            facingPoint.y = heading['Y']
+            
+            
+            facingAngle = calcFacingAngle(facingPoint)
+            adjustAngle = calcAdjustAngle(facingAngle, dict['steeringAngle'])
+            
+            
+            if dict['fail'] == False:
+                timeToRun = dict['hypotenuse']  / defaultSpeed
+                postSpeed(adjustAngle,defaultSpeed)
+                time.sleep(int(round(timeToRun)))
+            
         
     except UnexpectedResponse as ex:
         print('Unexpected response from server when sending speed commands:', ex)
