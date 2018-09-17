@@ -148,26 +148,42 @@ def calcSteeringAngle(destPoint, currentPoint):
         return dict
     else:
         print("Distance to target point: ", hypotenuse)
-        angleInRadians = acos(deltaY / hypotenuse)
+        angleInRadians = acos(deltaX / hypotenuse)
         print("Angle in radians: ", angleInRadians)
         dict['angle'] = angleInRadians
         return dict
-    
-    
-def calcFacingAngle(facingPoint):
-    x = facingPoint.x
-    facingAngle = acos(x / 1)
-    return facingAngle
 
-def calcAdjustAngle(facingAngle, steeringAngle):
-    diffAngle = (pi/2) - facingAngle
-    adjustAngle = diffAngle + steeringAngle
-    return adjustAngle
+def turnNorth(facingPoint):
+    if facingPoint.y < 0:
+        z = (pi/2) - acos(facingPoint.y / 1)
+        adjustAngle = (pi/2) + z
+        return adjustAngle
+    else:
+        adjustAngle = acos(facingPoint.y / 1)
+        return adjustAngle            
+                 
+def calcTurningAngle(destPoint, currentPoint, steeringAngle, adjustAngle):
+    if destPoint.y < currentPoint.y:
+        turningAngle = adjustAngle - (pi/2) + steeringAngle
+        return turningAngle
+    else: 
+        turningAngle = adjustAngle - ((pi/2) - steeringAngle)
+        return turningAngle
+    
+def lookAheadFunction(path, lookAheadIndex, lookAheadDistance, destPoint):
+    print("lookAheadIndex :" , lookAheadIndex)
+    if lookAheadDistance < 0.5:
+        lookAheadIndex = lookAheadIndex + 1
+        destPoint.x = path.vecPath[lookAheadIndex]['X']
+        destPoint.y = path.vecPath[lookAheadIndex]['Y']
+        return destPoint
+    
 
 if __name__ == '__main__':
     print('Sending commands to MRDS server', MRDS_URL)
     try:
         path = Path()
+        print('size' , len(path.vecPath))
         destPoint = Point()
         currentPoint = Point()
         facingPoint = Point()
@@ -175,28 +191,34 @@ if __name__ == '__main__':
         
         listLength = len(path.vecPath)
         
-        for i in range(0, listLength-10, 10):
-            heading = getHeading()
+        lookAheadIndex = 0;
+        
+        destPoint.x = path.vecPath[lookAheadIndex]["X"]
+        destPoint.y = path.vecPath[lookAheadIndex]["Y"]     
+        
+        while True:
             pose = getPose()
+            robotOrientation = getHeading()
             currentPoint.x = pose['Pose']['Position']['X']
             currentPoint.y = pose['Pose']['Position']['Y']
             
-            destPoint.x = path.vecPath[i+10]["X"]
-            destPoint.y = path.vecPath[i+10]["Y"]
-            
             dict = calcSteeringAngle(destPoint,currentPoint)
-            facingPoint.x = heading['X']
-            facingPoint.y = heading['Y']
             
-            
-            facingAngle = calcFacingAngle(facingPoint)
-            adjustAngle = calcAdjustAngle(facingAngle, dict['steeringAngle'])
-            
+            facingPoint.x = robotOrientation['X']
+            facingPoint.y = robotOrientation['Y']                
+           
+            adjustAngle = turnNorth(facingPoint)
+            turningAngle = calcTurningAngle(destPoint, currentPoint, dict['steeringAngle'], adjustAngle)
+            print("Turning angle: ", turningAngle)
+            print("Turning angle in degrees: " , degrees(turningAngle))
+                  
             
             if dict['fail'] == False:
                 timeToRun = dict['hypotenuse']  / defaultSpeed
-                postSpeed(adjustAngle,defaultSpeed)
+                postSpeed(turningAngle,defaultSpeed)
                 time.sleep(int(round(timeToRun)))
+                
+            destPoint = lookAheadFunction(path, lookAheadIndex, dict['hypotenuse'], destPoint)
             
         
     except UnexpectedResponse as ex:
