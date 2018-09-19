@@ -149,107 +149,56 @@ def getBearingAngle(destPoint, currentPoint):
 
 def calcLookAheadDistance(destPoint, currentPoint):
     
-    #deltaX = abs(currentPoint.x) - abs(destPoint.x)
-    #deltaY = abs(currentPoint.y) - abs(destPoint.y)
-    
     deltaX = currentPoint.x - destPoint.x
     deltaY = currentPoint.y - destPoint.y    
-    
-    """if (currentPoint.x > 0 and destPoint.x > 0) or (currentPoint.x < 0 and destPoint.x < 0):
-        deltaX = destPoint.x + currentPoint.x
-        deltaY = destPoint.y - currentPoint.y
-    elif (currentPoint.y > 0 and destPoint.y > 0) or (currentPoint.y < 0 and destPoint.y < 0):
-        deltaX = destPoint.x - currentPoint.x
-        deltaY = destPoint.y + currentPoint.y
-    elif (currentPoint.x > 0  and destPoint.y < 0) or (currentPoint.x < 0 and destPoint.y > 0):
-        deltaX = destPoint.x + currentPoint.x
-        deltaY = destPoint.y + currentPoint.y        
-    else:
-        deltaX = destPoint.x - currentPoint.x
-        deltaY = destPoint.y - currentPoint.y"""
-        
     
     lookAheadDistance = sqrt((deltaX**2) + (deltaY**2))
         
     return lookAheadDistance
     
-
-"""def calcSteeringAngle(destPoint, currentPoint):
-    dict = {'steeringAngle': 0, 'hypotenuse': 0, 'fail': False}
-    
-    if currentPoint.x > 0 and destPoint.x > 0:
-        deltaX = destPoint.x - currentPoint.x
-        deltaY = destPoint.y - currentPoint.y
-    elif currentPoint.x < 0 and destPoint.x < 0:
-        deltaX = destPoint.x - currentPoint.x
-        deltaY = destPoint.y - currentPoint.y
-    else:
-        deltaX = destPoint.x + currentPoint.x
-        deltaY = destPoint.y + currentPoint.y
-        
-    hypotenuse = sqrt((deltaX**2) + (deltaY**2))
-    dict['hypotenuse'] = hypotenuse
-    if hypotenuse == 0 :
-        dict['fail'] = True
-        return dict
-    else:
-        print("Distance to target point: ", hypotenuse)
-        angleInRadians = acos(deltaX / hypotenuse)
-        print("Angle in radians: ", angleInRadians)
-        dict['angle'] = angleInRadians
-        return dict"""
-
-def turnNorth():
-    
+def turnWest():
     robotOrientation = getHeading()
     facingPoint = Point()
     facingPoint.x = robotOrientation['X']
     facingPoint.y = robotOrientation['Y']
     
-    turnNorthDict = {'northAngle': 0, 'quadrant': 0}
+    turnWestDict = {'westAngle': 0, 'quadrant': 0}
     
     if facingPoint.x > 1 or facingPoint.y > 1:
-        return turnNorthDict
+        return turnWestDict
+    
+    if facingPoint.x == 1 and facingPoint.y == 1:
+        turnWestDict['quadrant'] = 5
+        return turnWestDict    
     
     if facingPoint.y < 0 and facingPoint.x < 0:
-        northAngle = asin(facingPoint.x / 1)
+        westAngle = acos(abs(facingPoint.y) / 1) + pi
+       
+        turnWestDict['westAngle'] = westAngle
+        turnWestDict['quadrant'] = 3
         
-        turnNorthDict['northAngle'] = northAngle
-        turnNorthDict['quadrant'] = 2
-        
-        return turnNorthDict
+        return turnWestDict
     elif facingPoint.y < 0 and facingPoint.x > 0:
-        northAngle = asin(facingPoint.x / 1)
+        westAngle = acos(facingPoint.x / 1) + (pi/2)
         
-        turnNorthDict['northAngle'] = northAngle
-        turnNorthDict['quadrant'] = 1
+        turnWestDict['westAngle'] = westAngle
+        turnWestDict['quadrant'] = 2
         
-        return turnNorthDict
+        return turnWestDict
     elif facingPoint.y > 0 and facingPoint.x < 0:
-        northAngle = acos(facingPoint.y / 1)
+        westAngle = acos(abs(facingPoint.x) / 1) + ((3*pi)/2)
         
-        turnNorthDict['northAngle'] = northAngle
-        turnNorthDict['quadrant'] = 3        
+        turnWestDict['westAngle'] = westAngle
+        turnWestDict['quadrant'] = 4      
         
-        return turnNorthDict
+        return turnWestDict
     else:
-        northAngle = acos(facingPoint.y / 1)
+        westAngle = acos(facingPoint.y / 1)
         
-        turnNorthDict['northAngle'] = northAngle
-        turnNorthDict['quadrant'] = 4
+        turnWestDict['westAngle'] = westAngle
+        turnWestDict['quadrant'] = 1
         
-        return turnNorthDict            
-                 
-"""def calcTurningAngle(destPoint, currentPoint, steeringAngle, turnNorthDict):
-    if destPoint.y < currentPoint.y:
-        if destPoint.x > currentPoint.X:
-        print("Curret Y is SMALLER")
-        turningAngle = northAngle - (pi/2) + steeringAngle
-        return turningAngle
-    else:
-        print("Curret Y is BIGGER")
-        turningAngle = northAngle - ((pi/2) - steeringAngle)
-        return turningAngle"""
+        return turnWestDict     
     
 def lookAheadFunction(path, currentPoint, angle):
     destPoint = Point()
@@ -261,41 +210,34 @@ def lookAheadFunction(path, currentPoint, angle):
     lookAheadDistance = calcLookAheadDistance(destPoint, currentPoint)
     
     print("lookAheadDistance: ", lookAheadDistance)
-    threashHold = abs(2/angle)
+    threashHold = abs(1/angle)
     print("threashHold: ", threashHold)
     
-    if lookAheadDistance > threashHold:
+    if lookAheadDistance > 1.1:
         steeringAngle = getBearingAngle(destPoint, currentPoint)
-        steeringAngle = steeringAngle - (pi/2)
-        turnNorthDict = turnNorth()
-
-        if(turnNorthDict['quadrant'] != 0):
-            turnNorthDict['northAngle'] = turnNorthDict['northAngle'] - (pi/2)
-        
-        if(turnNorthDict['quadrant'] == 1 or turnNorthDict['quadrant'] == 2):
-            turnNorthDict['northAngle'] = abs(turnNorthDict['northAngle'])
-            print("CONV = " , degrees(turnNorthDict['northAngle']))
-            
-                
-        
-        print("steeringAngle: " , degrees(steeringAngle))
-        print("NorthAngle in quadrant: ", degrees(turnNorthDict['northAngle']),turnNorthDict['quadrant'])
-        
-             
-        turningAngle = turnNorthDict['northAngle']  - steeringAngle
-        
+        steeringAngle = steeringAngle
+        turnWestDict = turnWest()
+        westAngle = turnWestDict['westAngle']
        
-            
+        print("steeringAngle: " , degrees(steeringAngle))
+        print("WestAngle in quadrant: ", degrees(westAngle),turnWestDict['quadrant'])
+        
+        if(steeringAngle < westAngle):
+            turningAngle = westAngle - steeringAngle
+        else:
+            turningAngle = steeringAngle - westAngle
+            if(turnWestDict['quadrant'] != 3 or turnWestDict['quadrant'] != 4):
+                turningAngle = -turningAngle
+        
+        
+        if(pi < abs(turningAngle)):
+            turningAngle = (2*pi) - abs(turningAngle)
+            turningAngle = -turningAngle 
         
         print("TurningAngle: ", degrees(turningAngle))
         
-        smartPostSpeed(turningAngle)
-        #postSpeed(turningAngle,0.5)
-        #print("Destpoint X: ", destPoint.x)
-        #print("Destpoint Y: ", destPoint.y)         
-    
-        #path.vecPath.pop(0)
-        #Do STuff
+        #smartPostSpeed(turningAngle)
+        postSpeed(turningAngle,0.5)
         return turningAngle
     else:
         print("Pop")
@@ -306,7 +248,7 @@ def lookAheadFunction(path, currentPoint, angle):
     
 def smartPostSpeed(turningAngle):
     #If turning angle is big don't go fast
-    postSpeed(turningAngle, abs(1 / turningAngle))
+    postSpeed(turningAngle, abs(2 / turningAngle))
     
     
 
@@ -325,9 +267,6 @@ if __name__ == '__main__':
             currentPoint.x = pose['Pose']['Position']['X']
             currentPoint.y = pose['Pose']['Position']['Y']
             
-            #print("CurrentPOS X: ", currentPoint.x)
-            #print("CurrentPOS Y: ", currentPoint.y)
-            
             angle = lookAheadFunction(path, currentPoint, angle)
             
             if(len(path.vecPath) == 0):
@@ -335,30 +274,6 @@ if __name__ == '__main__':
                 break
             
             time.sleep(0.01)
-            
-            
-            
-            
-            
-            
-            """dict = calcSteeringAngle(destPoint,currentPoint)
-            
-            facingPoint.x = robotOrientation['X']
-            facingPoint.y = robotOrientation['Y']                
-           
-            turnNorthDict = turnNorth(facingPoint)
-            turningAngle = calcTurningAngle(destPoint, currentPoint, dict['steeringAngle'], turnNorthDict)
-            print("Turning angle: ", turningAngle)
-            print("Turning angle in degrees: " , degrees(turningAngle))
-                  
-            
-            if dict['fail'] == False:
-                timeToRun = dict['hypotenuse']  / defaultSpeed
-                postSpeed(turningAngle,defaultSpeed)
-                #time.sleep(int(round(timeToRun)))
-                time.sleep(2)
-                lookAheadDict = lookAheadFunction(path, lookAheadDict , dict['hypotenuse'])"""
-            
-        
+
     except UnexpectedResponse as ex:
         print('Unexpected response from server when sending speed commands:', ex)
