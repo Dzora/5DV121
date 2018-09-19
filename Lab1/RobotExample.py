@@ -26,6 +26,7 @@ class Path:
     def __init__(self):
     # Load the path from a file and convert it into a list of coordinates
         self.loadPath('Path-around-table-and-back.json')
+        #self.loadPath('Path-around-table.json')
         self.vecPath = self.vectorizePath()
     
     def loadPath(self, file_name):
@@ -198,7 +199,18 @@ def turnWest():
         turnWestDict['westAngle'] = westAngle
         turnWestDict['quadrant'] = 1
         
-        return turnWestDict     
+        return turnWestDict
+    
+def calcDynamicThreshHold(angle):
+    prevAngle = degrees(angle)
+    threashHold = 10/abs(prevAngle)
+    if(threashHold < 1):
+        threashHold = 1
+    elif(threashHold > 2):
+        threashHold = 2
+        
+    print("threashHold: ", threashHold)    
+    return threashHold
     
 def lookAheadFunction(path, currentPoint, angle):
     destPoint = Point()
@@ -210,10 +222,10 @@ def lookAheadFunction(path, currentPoint, angle):
     lookAheadDistance = calcLookAheadDistance(destPoint, currentPoint)
     
     print("lookAheadDistance: ", lookAheadDistance)
-    threashHold = abs(1/angle)
-    print("threashHold: ", threashHold)
     
-    if lookAheadDistance > 1.1:
+    threashHold = calcDynamicThreshHold(angle)
+    
+    if lookAheadDistance > threashHold:
         steeringAngle = getBearingAngle(destPoint, currentPoint)
         steeringAngle = steeringAngle
         turnWestDict = turnWest()
@@ -234,21 +246,24 @@ def lookAheadFunction(path, currentPoint, angle):
             turningAngle = (2*pi) - abs(turningAngle)
             turningAngle = -turningAngle 
         
-        print("TurningAngle: ", degrees(turningAngle))
+        #print("TurningAngle: ", degrees(turningAngle))
+        print("TurningAngle: ", turningAngle)
         
-        #smartPostSpeed(turningAngle)
-        postSpeed(turningAngle,0.5)
+        smartPostSpeed(turningAngle)
+        #postSpeed(turningAngle,0.5)
         return turningAngle
     else:
         print("Pop")
         path.vecPath.pop(0)
         return 1
     
-    
-    
 def smartPostSpeed(turningAngle):
     #If turning angle is big don't go fast
-    postSpeed(turningAngle, abs(2 / turningAngle))
+    turnRadius = degrees(turningAngle)
+    print("TurnRadius :", turnRadius)
+    dynamicSpeed = 30 / abs(turnRadius)
+    print("dynamicSpeed : ", dynamicSpeed)
+    postSpeed(turningAngle, dynamicSpeed)
     
     
 
@@ -273,7 +288,7 @@ if __name__ == '__main__':
                 print("DONE")
                 break
             
-            time.sleep(0.01)
+            time.sleep(0.001)
 
     except UnexpectedResponse as ex:
         print('Unexpected response from server when sending speed commands:', ex)
