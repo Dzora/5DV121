@@ -268,12 +268,24 @@ def lookAheadFunction(path, currentPoint, angle):
         steeringAngle = getBearingAngle(destPoint, currentPoint)
         steeringAngle = steeringAngle - (pi/2)
         turnNorthDict = turnNorth()
-        turnNorthDict['northAngle'] = turnNorthDict['northAngle'] - (pi/2)
+
+        if(turnNorthDict['quadrant'] != 0):
+            turnNorthDict['northAngle'] = turnNorthDict['northAngle'] - (pi/2)
+        
+        if(turnNorthDict['quadrant'] == 1 or turnNorthDict['quadrant'] == 2):
+            turnNorthDict['northAngle'] = abs(turnNorthDict['northAngle'])
+            print("CONV = " , degrees(turnNorthDict['northAngle']))
+            
+                
         
         print("steeringAngle: " , degrees(steeringAngle))
         print("NorthAngle in quadrant: ", degrees(turnNorthDict['northAngle']),turnNorthDict['quadrant'])
         
+             
         turningAngle = turnNorthDict['northAngle']  - steeringAngle
+        
+       
+            
         
         print("TurningAngle: ", degrees(turningAngle))
         
