@@ -165,7 +165,7 @@ def turnWest():
     
     turnWestDict = {'westAngle': 0, 'quadrant': 0}
     
-    if facingPoint.x > 1 or facingPoint.y > 1:
+    if abs(facingPoint.x) > 1 or abs(facingPoint.y) > 1:
         return turnWestDict
     
     if facingPoint.x == 1 and facingPoint.y == 1:
@@ -202,12 +202,13 @@ def turnWest():
         return turnWestDict
     
 def calcDynamicThreshHold(angle):
-    prevAngle = degrees(angle)
-    threashHold = 10/abs(prevAngle)
-    if(threashHold < 1):
-        threashHold = 1
-    elif(threashHold > 2):
+    prevAngle = abs(angle)
+    if(prevAngle < 30):
         threashHold = 2
+    elif(prevAngle > 90):
+        threashHold = 1
+    else:
+        threashHold = 1.5
         
     print("threashHold: ", threashHold)    
     return threashHold
@@ -251,17 +252,18 @@ def lookAheadFunction(path, currentPoint, angle):
         
         smartPostSpeed(turningAngle)
         #postSpeed(turningAngle,0.5)
-        return turningAngle
+        turningAngleInDegrees = degrees(turningAngle)
+        return turningAngleInDegrees
     else:
         print("Pop")
         path.vecPath.pop(0)
-        return 1
+        return 10
     
 def smartPostSpeed(turningAngle):
     #If turning angle is big don't go fast
     turnRadius = degrees(turningAngle)
     print("TurnRadius :", turnRadius)
-    dynamicSpeed = 30 / abs(turnRadius)
+    dynamicSpeed = 30/ abs(turnRadius)
     print("dynamicSpeed : ", dynamicSpeed)
     postSpeed(turningAngle, dynamicSpeed)
     
@@ -273,7 +275,7 @@ if __name__ == '__main__':
         path = Path()
         currentPoint = Point()
         defaultSpeed = 0.2
-        angle = 1;
+        angle = 10;
         
         while True:
             
@@ -286,6 +288,7 @@ if __name__ == '__main__':
             
             if(len(path.vecPath) == 0):
                 print("DONE")
+                postSpeed(0,0)
                 break
             
             time.sleep(0.001)
