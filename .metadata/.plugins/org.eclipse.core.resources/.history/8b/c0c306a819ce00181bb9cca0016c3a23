@@ -1,0 +1,22 @@
+package lab5;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+
+public class Parser {
+	
+	public Parser() {
+		Images images = new Images();
+	}
+	
+	public void readFile(String fileName) {
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+		    String line;
+		    while ((line = br.readLine()) != null) {
+		       // process the line.
+		    }
+		}
+	}
+
+}

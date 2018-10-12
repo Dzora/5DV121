@@ -4,6 +4,9 @@ Example demonstrating how to communicate with Microsoft Robotic Developer
 Studio 4 via the Lokarria http interface. 
 """
 
+START_THRESHOLD = 0.1
+PASS_THRESHOLD = 1.5
+GOAL_THRESHOLD = 1
 MRDS_URL = 'localhost:50000'
 
 import http.client, json, time
@@ -27,6 +30,8 @@ class Path:
     # Load the path from a file and convert it into a list of coordinates
         self.loadPath('Path-around-table-and-back.json')
         #self.loadPath('Path-around-table.json')
+        #self.loadPath('Path-from-bed.json')
+        #self.loadPath('Path-to-bed.json')
         self.vecPath = self.vectorizePath()
     
     def loadPath(self, file_name):
@@ -41,7 +46,7 @@ class Path:
                      'Y': p['Pose']['Position']['Y'], \
                      'Z': p['Pose']['Position']['Z']}\
                      for p in self.path]
-        return vecArray        
+        return vecArray
 
 def postSpeed(angularSpeed,linearSpeed):
     """Sends a speed command to the MRDS server"""
@@ -140,18 +145,24 @@ def getHeading():
 def getBearingAngle(destPoint, currentPoint):
     deltaX = abs(destPoint.x) - abs(currentPoint.x)
     deltaY = abs(destPoint.y) - abs(currentPoint.y)
+    #deltaX = destPoint.x - currentPoint.x
+    #deltaY = destPoint.y - currentPoint.y         
+     
     
     theta = atan2(deltaX,deltaY)
     
     if theta < 0:
+        print("THETA: ", theta)
         theta = (2 * pi) + theta
+        print("CURR: " , currentPoint.x, currentPoint.y)
+        print("DEST: " , destPoint.x, destPoint.y)
         
     return theta
 
 def calcLookAheadDistance(destPoint, currentPoint):
     
     deltaX = currentPoint.x - destPoint.x
-    deltaY = currentPoint.y - destPoint.y    
+    deltaY = currentPoint.y - destPoint.y   
     
     lookAheadDistance = sqrt((deltaX**2) + (deltaY**2))
         
@@ -166,10 +177,11 @@ def turnWest():
     turnWestDict = {'westAngle': 0, 'quadrant': 0}
     
     if abs(facingPoint.x) > 1 or abs(facingPoint.y) > 1:
+        turnWestDict['quadrant'] = 5
         return turnWestDict
     
     if facingPoint.x == 1 and facingPoint.y == 1:
-        turnWestDict['quadrant'] = 5
+        turnWestDict['quadrant'] = 6
         return turnWestDict    
     
     if facingPoint.y < 0 and facingPoint.x < 0:
@@ -206,11 +218,11 @@ def calcDynamicThreshHold(angle):
     if(prevAngle < 30):
         threashHold = 2
     elif(prevAngle > 90):
-        threashHold = 1
+        threashHold = 1.3
     else:
-        threashHold = 1.5
+        threashHold = 1.8
         
-    print("threashHold: ", threashHold)    
+    #print("threashHold: ", threashHold)    
     return threashHold
     
 def lookAheadFunction(path, currentPoint, angle):
@@ -226,9 +238,8 @@ def lookAheadFunction(path, currentPoint, angle):
     
     threashHold = calcDynamicThreshHold(angle)
     
-    if lookAheadDistance > threashHold:
+    if lookAheadDistance > 1:
         steeringAngle = getBearingAngle(destPoint, currentPoint)
-        steeringAngle = steeringAngle
         turnWestDict = turnWest()
         westAngle = turnWestDict['westAngle']
        
@@ -245,13 +256,17 @@ def lookAheadFunction(path, currentPoint, angle):
         
         if(pi < abs(turningAngle)):
             turningAngle = (2*pi) - abs(turningAngle)
-            turningAngle = -turningAngle 
+            turningAngle = -turningAngle
+               
         
-        #print("TurningAngle: ", degrees(turningAngle))
-        print("TurningAngle: ", turningAngle)
         
-        smartPostSpeed(turningAngle)
-        #postSpeed(turningAngle,0.5)
+        
+        print("TurningAngle: ", degrees(turningAngle))
+        #print("TurningAngle: ", turningAngle)
+        
+        #smartPostSpeed(turningAngle)
+        newSmartPostSpeed(turningAngle)
+        #postSpeed(turningAngle,0.7)
         turningAngleInDegrees = degrees(turningAngle)
         return turningAngleInDegrees
     else:
@@ -262,12 +277,20 @@ def lookAheadFunction(path, currentPoint, angle):
 def smartPostSpeed(turningAngle):
     #If turning angle is big don't go fast
     turnRadius = degrees(turningAngle)
-    print("TurnRadius :", turnRadius)
+    #print("TurnRadius :", turnRadius)
     dynamicSpeed = 30/ abs(turnRadius)
-    print("dynamicSpeed : ", dynamicSpeed)
+    #print("dynamicSpeed : ", dynamicSpeed)
     postSpeed(turningAngle, dynamicSpeed)
     
     
+def newSmartPostSpeed(turningAngle):
+    #If turning angle is big don't go fast
+    turnDiff = (turningAngle / (pi/2))
+    #print("TurnDiff :", turnDiff)
+    konst = 5
+    angSpeed = konst * turnDiff
+    linSpeed = (konst/3) * (1-abs(turnDiff))
+    postSpeed(angSpeed, linSpeed)  
 
 if __name__ == '__main__':
     print('Sending commands to MRDS server', MRDS_URL)
@@ -276,9 +299,7 @@ if __name__ == '__main__':
         currentPoint = Point()
         defaultSpeed = 0.2
         angle = 10;
-        
         while True:
-            
             print("---------------------------")
             pose = getPose()
             currentPoint.x = pose['Pose']['Position']['X']
@@ -291,7 +312,7 @@ if __name__ == '__main__':
                 postSpeed(0,0)
                 break
             
-            time.sleep(0.001)
+            time.sleep(0.01 )
 
     except UnexpectedResponse as ex:
         print('Unexpected response from server when sending speed commands:', ex)

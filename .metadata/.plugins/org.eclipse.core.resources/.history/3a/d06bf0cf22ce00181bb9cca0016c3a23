@@ -1,0 +1,23 @@
+package lab5;
+
+import java.io.IOException;
+
+public class Main {
+	
+	private static Images images;
+
+	public static void main(String[] args) {
+		Parser parser = new Parser();
+		
+		try {
+			
+			this.images = parser.readFile("images.txt");
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+}

@@ -1,0 +1,18 @@
+package lab5;
+
+
+public class Parser {
+	
+	public Parser() {
+		Images images = new Images();
+	}
+	
+	public void readFile(String fileName) {
+		
+	}
+	
+	privatev void readEachLine() {
+		
+	}
+
+}

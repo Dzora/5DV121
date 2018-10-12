@@ -1,0 +1,13 @@
+package lab5;
+
+import java.util.HashMap;
+
+public class Image {
+	
+	private HashMap<String, String> imageBlock;
+	
+	public Image() {
+		
+	}
+
+}

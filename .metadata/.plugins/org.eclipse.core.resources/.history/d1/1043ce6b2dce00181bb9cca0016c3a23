@@ -1,0 +1,95 @@
+package lab5;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class Parser {
+
+	private Images images;
+	private int matrixIndex = 0;
+	private String heading = "";
+	private int[][] image;
+
+	public Parser() {
+		this.images = new Images();
+	}
+
+	public Images readFile(String fileName) throws FileNotFoundException,IOException {
+
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				//checkForNewImage(line);
+				System.out.println(line);
+				System.out.println("----");
+				
+ 			}
+		}
+		
+		
+		
+		
+		
+		
+		/*int[][] image = images.imageBlockMap.get("Image1");
+		
+		for (int i = 0; i < image.length; i++) {
+		    for (int j = 0; j < image[i].length; j++) {
+		        System.out.print(image[i][j] + " ");
+		    }
+		    System.out.println();
+		}*/
+		
+		
+		
+		return images;
+	}
+	
+	private void checkForImage(String line) {
+		if(line.contains("Image")) {
+			System.out.println(line);
+		}
+	}
+	
+	
+	
+	
+
+/*	private void checkForNewImage(String line) {	
+		
+		if (!line.contains("#") || !line.isEmpty()) {
+			if (line.contains("Image")) {
+				heading = line;
+				//System.out.println(heading);
+				image = new int[20][20];
+			} else {
+				
+				if (matrixIndex == 20) {
+					images.imageBlockMap.put(heading, image);
+					matrixIndex = 0;
+				}
+				
+				readAllGreyLevelsOnLine(line);
+				matrixIndex++;
+			}
+		}
+	}
+
+	private void readAllGreyLevelsOnLine(String line) {
+		//System.out.println("LINE : " + line);
+		String[] greyAreas = line.split(" ");
+		if (greyAreas.length == 20) {
+			//System.out.println(heading);
+			for (int i = 0; i < greyAreas.length; i++) {
+				//System.out.println("MatrixIndex : " + matrixIndex);
+				//System.out.println("i : " + i);
+		//		System.out.println("GreyArea : "+ Integer.parseInt(greyAreas[i]));
+				image[matrixIndex][i] = Integer.parseInt(greyAreas[i]);
+			}
+		//	System.out.println("---------");
+		}
+	}*/
+
+}

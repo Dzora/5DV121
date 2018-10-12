@@ -1,0 +1,32 @@
+package lab5;
+
+import java.io.IOException;
+
+public class Main {
+	
+	private static Images images;
+
+	public static void main(String[] args) {
+		Parser parser = new Parser();
+		
+		try {
+			
+			images = parser.readFile("images.txt");
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		int[][] image = images.imageBlockMap.get("Image200");
+		
+		for (int i = 0; i < matrix.length; i++) {
+		    for (int j = 0; j < matrix[i].length; j++) {
+		        System.out.print(matrix[i][j] + " ");
+		    }
+		    System.out.println();
+		}
+
+	}
+
+}

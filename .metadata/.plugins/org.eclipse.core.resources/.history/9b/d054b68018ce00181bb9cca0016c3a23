@@ -1,0 +1,11 @@
+package lab5;
+
+public class Image {
+	
+	private String heading;
+	
+	public Image() {
+		
+	}
+
+}

@@ -1,0 +1,24 @@
+package lab5;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+
+public class Parser {
+	
+	public Parser() {
+		Images images = new Images();
+	}
+	
+	public void readFile(String fileName) throws FileNotFoundException, IOException {
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+		    String line;
+		    while ((line = br.readLine()) != null) {
+		       System.out.println(line);
+		    }
+		}
+	}
+
+}
