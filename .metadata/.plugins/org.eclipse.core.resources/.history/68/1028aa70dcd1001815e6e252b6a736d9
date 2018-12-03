@@ -1,0 +1,163 @@
+package lab5;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class Parser {
+
+	private Images images;
+	private int matrixIndex = 0;
+	private String heading = "";
+	private double[][] image;
+
+	public Parser() {
+		this.images = new Images();
+	}
+
+	public Images readFile(String fileName, String keyFileName) throws FileNotFoundException,IOException {
+		
+		parseImage(fileName);
+		if(!keyFileName.isEmpty()) {
+			parseKeys(keyFileName);
+		}
+		return images;
+	}
+	
+	private void parseKeys(String keyName) throws FileNotFoundException, IOException {
+		try (BufferedReader br = new BufferedReader(new FileReader(keyName))) {
+			String line;
+			File file = new File(keyName);
+			int fileSize = (int) file.length();
+			int h = 0;
+			int s = 0;
+			int m = 0;
+			int a = 0;
+			String[] happyImages = new String[fileSize];
+			String[] sadImages = new String[fileSize];
+			String[] missImages =  new String[fileSize];
+			String[] angryImages =  new String[fileSize];
+			while ((line = br.readLine()) != null) {
+				
+				if(isCommentOrEmpty(line)){
+					continue;
+				}
+				
+				String[] keys = line.split(" ");
+	
+				switch (keys[1]) {
+				case "1":
+					happyImages[h] = keys[0];
+					h++;
+					continue;
+				case "2":
+					sadImages[s] = keys[0];
+					s++;
+					continue;
+				case "3":
+					missImages[m] = keys[0];
+					m++;
+					continue;
+				case "4":	
+					angryImages[a] = keys[0];
+					a++;
+					continue;
+				default:
+					break;
+				}
+				
+				
+			}
+			
+			
+			
+			images.keyMap.put(1, removeNullFromKeyMap(happyImages));
+			images.keyMap.put(2, removeNullFromKeyMap(sadImages));
+			images.keyMap.put(3, removeNullFromKeyMap(missImages));
+			images.keyMap.put(4, removeNullFromKeyMap(angryImages));
+		
+		}
+	}
+	
+	private String[] removeNullFromKeyMap(String[] map) {
+		int count = 0;
+		for (int i = 0; i < map.length; i++) {
+			if(!(map[i] == null) ) {
+				count++;
+			}
+		}
+		String[] newMap = new String[count];
+		
+		int j = 0;
+		for (int i = 0; i < map.length; i++) {
+			if(!(map[i] == null) ) {
+				newMap[j] = map[i];
+				j++;
+			}
+		}
+		
+		return newMap;
+	}
+	
+	private void parseImage(String fileName) throws FileNotFoundException, IOException {
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				
+				if(isCommentOrEmpty(line)){
+					continue;
+				}
+				
+				if (matrixIndex == 20) {
+					images.imageBlockMap.put(heading, image);
+					matrixIndex = 0;
+				}
+				
+				if(checkForImage(line)){
+					continue;
+				}
+				
+				buildImage(line);
+				
+				matrixIndex++;
+ 			}
+			
+			images.imageBlockMap.put(heading, image);
+		}
+	}
+	
+	private void buildImage(String line) {
+		String[] greyAreas = line.split(" ");
+		
+		for(int i = 0; i < greyAreas.length; i++) {
+			double d = Integer.parseInt(greyAreas[i] ) / 31;
+			System.out.println(d);
+			image[matrixIndex][i] = d;
+		}
+		
+	}
+	
+	private boolean checkForImage(String line) {
+		if(line.contains("Image")) {
+			heading = line;
+			image = new double[20][20];
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	private boolean isCommentOrEmpty(String line) {
+		if(line.isEmpty() || line.contains("#")) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+}

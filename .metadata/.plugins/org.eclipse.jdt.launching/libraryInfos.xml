@@ -19,6 +19,25 @@
 <entry path="/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/endorsed"/>
 </endorsedDirs>
 </libraryInfo>
+<libraryInfo home="C:\Program Files\Zulu\zulu-8" version="1.8.0_181">
+<bootpath>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\resources.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\rt.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\sunrsasign.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\jsse.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\jce.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\charsets.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\jfr.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\classes"/>
+</bootpath>
+<extensionDirs>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\ext"/>
+<entry path="C:\windows\Sun\Java\lib\ext"/>
+</extensionDirs>
+<endorsedDirs>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\endorsed"/>
+</endorsedDirs>
+</libraryInfo>
 <libraryInfo home="/usr/lib/jvm/java-8-openjdk-amd64" version="1.8.0_181">
 <bootpath>
 <entry path="/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/resources.jar"/>
@@ -36,6 +55,25 @@
 </extensionDirs>
 <endorsedDirs>
 <entry path="/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/endorsed"/>
+</endorsedDirs>
+</libraryInfo>
+<libraryInfo home="C:\Program Files\Zulu\zulu-8\jre" version="1.8.0_181">
+<bootpath>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\resources.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\rt.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\sunrsasign.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\jsse.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\jce.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\charsets.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\jfr.jar"/>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\classes"/>
+</bootpath>
+<extensionDirs>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\ext"/>
+<entry path="C:\windows\Sun\Java\lib\ext"/>
+</extensionDirs>
+<endorsedDirs>
+<entry path="C:\Program Files\Zulu\zulu-8\jre\lib\endorsed"/>
 </endorsedDirs>
 </libraryInfo>
 </libraryInfos>

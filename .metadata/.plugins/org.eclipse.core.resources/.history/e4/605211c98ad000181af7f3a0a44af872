@@ -1,0 +1,35 @@
+package lab5;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class Main {
+	
+
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+		Parser parser = new Parser();
+		
+		Images images = parser.readFile("images.txt", "keys.txt");
+		Trainer trainer = new Trainer(images);
+		trainer.
+		
+		/*try {
+			
+			Images images = parser.readFile("images.txt", "keys.txt");
+			
+			Perceptron perception = new Perceptron(images);
+			perception.run();
+			
+			for(int i = 0; i < images.keyMap.get(2).length; i++) {
+				String[] test =  images.keyMap.get(2);
+				System.out.println(test[i]);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+	
+	}
+
+}

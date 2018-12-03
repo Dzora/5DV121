@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dirs>
-<entry loc="/usr/lib/jvm/java-8-openjdk-amd64" stamp="1537381673000"/>
+<entry loc="/usr/lib/jvm/java-8-openjdk-amd64/jre" stamp="1537381638000"/>
+<entry loc="C:\Program Files\Zulu\zulu-8" stamp="1538462112141"/>
+<entry loc="/usr/lib/jvm/java-8-openjdk-amd64" stamp="1537381306000"/>
 </dirs>

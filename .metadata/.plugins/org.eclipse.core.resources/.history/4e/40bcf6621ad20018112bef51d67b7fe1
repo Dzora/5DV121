@@ -1,0 +1,45 @@
+//package lab5;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class Faces {
+	
+
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+		
+		if (args.length != 3) {
+			System.out.println("Usage: java Faces images.txt keys.txt test.txt");
+	    	System.exit(-1);
+	    }
+		
+		Parser parser = new Parser();
+		
+		Images images = parser.readFile(args[0], args[1]);
+		
+		Trainer happyTrainer = new Trainer(images,1);
+		happyTrainer.Learn();
+		//System.out.println("DONE TRAINING HAPPY-------------------");
+		
+		Trainer sadTrainer = new Trainer(images,2);
+		sadTrainer.Learn();
+		//System.out.println("DONE TRAINING SAD-------------------");
+		
+		Trainer missTrainer = new Trainer(images,3);
+		missTrainer.Learn();
+		//System.out.println("DONE TRAINING ANGRY------------------");
+		
+		Trainer angryTrainer = new Trainer(images,4);
+		angryTrainer.Learn();
+		
+		
+		Parser testParser = new Parser();
+		Images testImages = testParser.readFile(args[2], "");
+		
+		Guesser guesser = new Guesser(happyTrainer,sadTrainer,missTrainer,angryTrainer,testImages);
+		
+		guesser.guess();
+	
+	}
+
+}

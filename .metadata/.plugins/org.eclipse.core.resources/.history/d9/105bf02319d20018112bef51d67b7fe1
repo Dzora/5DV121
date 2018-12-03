@@ -1,0 +1,131 @@
+package lab5;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
+
+public class Guesser {
+
+	private Trainer happyTrainer;
+	private Trainer sadTrainer;
+	private Trainer missTrainer;
+	private Trainer angryTrainer;
+	private Images testImages;
+	private int[] arr;
+
+	public Guesser(Trainer happy, Trainer sad, Trainer miss, Trainer angry,
+			Images testImages) {
+		this.happyTrainer = happy;
+		this.sadTrainer = sad;
+		this.missTrainer = miss;
+		this.angryTrainer = angry;
+		this.testImages = testImages;
+
+		happyTrainer.perceptron.cleanImages(testImages);
+		sadTrainer.perceptron.cleanImages(testImages);
+		missTrainer.perceptron.cleanImages(testImages);
+		angryTrainer.perceptron.cleanImages(testImages);
+	}
+
+	public void guess() {
+
+		//try (BufferedWriter bw = new BufferedWriter(
+		//		new FileWriter("result.txt"))) {
+
+			//System.out.println("Done");
+			int i = 0;
+			arr = new int[testImages.imageBlockMap.size()];
+
+			for (String image : testImages.imageBlockMap.keySet()) {
+				addImageToSortingArray(image, i);
+				i++;
+			}
+
+			sortArray();
+
+			for (int imageNumber : arr) {
+				//System.out.println("image" + imageNumber);
+				double[][] image = testImages.imageBlockMap.get("Image" + imageNumber);
+				
+				double a = happyTrainer.perceptron.run(image);
+				//System.out.println("Happy : " + a);
+				double b = sadTrainer.perceptron.run(image);
+				//System.out.println("Sad : " + b);
+				double c = missTrainer.perceptron.run(image);
+				//System.out.println("Miss : " + c);
+				double d = angryTrainer.perceptron.run(image);
+				//System.out.println("Angry : " + d);
+				
+				//System.out.println("-------------");
+				/*double aError = findClosestNumber(a);
+				double bError = findClosestNumber(b);
+				double cError = findClosestNumber(c);
+				double dError = findClosestNumber(d);
+				
+				double closest = Math.min(aError, Math.min(bError, Math.min(cError, dError)));
+				
+				if (closest == aError) {
+						 System.out.println("Image" + imageNumber + " is happy  -> " + a);
+						 bw.write("Image" + imageNumber + " 1\n");
+					} else if (closest == bError) {
+						 System.out.println("Image" + imageNumber + " is sad  -> " + b);
+						 bw.write("Image" + imageNumber + " 2\n");
+					} else if (closest == cError) {
+						 System.out.println("Image" + imageNumber + " is misscheviuos  -> " +  c);
+						 bw.write("Image" + imageNumber + " 3\n");
+					} else if (closest == dError) {
+						 System.out.println("Image" + imageNumber + " is angry  -> " + d);
+						 bw.write("Image" + imageNumber + " 4\n");
+					}*/
+
+				double max = Math.max(a, Math.max(b, Math.max(c, d)));
+
+				
+				if (max == a) {
+						 System.out.println("Image" + imageNumber + " is happy  -> " + max);
+					//	 bw.write("Image" + imageNumber + " 1\n");
+					} else if (max == b) {
+						 System.out.println("Image" + imageNumber + " is sad  -> " + max);
+					//	 bw.write("Image" + imageNumber + " 2\n");
+					} else if (max == c) {
+						 System.out.println("Image" + imageNumber + " is misscheviuos  -> " +  max);
+					//	 bw.write("Image" + imageNumber + " 3\n");
+					} else if (max == d) {
+						 System.out.println("Image" + imageNumber + " is angry  -> " + max);
+					//	 bw.write("Image" + imageNumber + " 4\n");
+					}
+				
+			}
+
+			/*bw.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+
+	}
+
+	private void addImageToSortingArray(String image, int i) {
+
+		String[] counter = image.split("Image");
+
+		arr[i] = Integer.parseInt(counter[1]);
+
+	}
+
+	private void sortArray() {
+		Arrays.sort(arr);
+	}
+	
+	private double findClosestNumber(double number) {
+		//System.out.println("Number = "+ number);
+		double goal = 0.5;
+		double error = goal - number;
+		
+		
+		//System.out.println(error);
+		return Math.abs(error);
+	}
+}

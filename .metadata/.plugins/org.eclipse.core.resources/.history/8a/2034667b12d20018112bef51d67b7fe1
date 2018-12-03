@@ -1,0 +1,105 @@
+package lab5;
+
+import java.util.Vector;
+import java.util.Random;
+
+public class Perceptron {
+	
+	private Images images;
+	private Vector<Double> pixelVector;
+	private Vector<Double> weightVector;
+	private boolean doneRandoWeights = false;
+	
+	public Perceptron(Images images) {
+		this.pixelVector = new Vector<>();
+		this.weightVector = new Vector<>();
+		this.images = images;
+	
+	
+	}
+	
+	private void fillWeightVector(Vector<Double> vector) {
+		for (int i = 0; i < pixelVector.size(); i++) {
+			Random rand = new Random();
+			double random = rand.nextDouble();
+			vector.add(random);
+		}
+		System.out.println("SHOULD ONLY COME HERE ONCE PER PERCETRON");
+		doneRandoWeights = true;
+	}
+	
+	private void fillPixelVector(double[][] image) {
+		for (int i = 0; i < image.length; i++) {
+		    for (int j = 0; j < image[i].length; j++) {
+		        pixelVector.add((double)image[i][j]);
+		    }
+		}
+	}
+	
+	public double run(double[][] image) {
+		pixelVector.clear();
+		
+	//	fillPixelVector(images.imageBlockMap.get(image));
+		fillPixelVector(image);
+		
+		if(!doneRandoWeights) {
+			weightVector.clear();
+			fillWeightVector(weightVector);
+		}	
+		
+		double d = multiplyVectors();
+		
+		//System.out.println("D = " + d);
+		
+		double sig = sigmoid(d);
+		
+		//System.out.println("Activation =" +sig);
+		return sig;
+		
+	}
+	
+	private double multiplyVectors() {
+		double res = 0;
+		double results = 0;
+		double bias = -50;
+		
+		for(int i = 0; i < pixelVector.size(); i++) {
+			
+			double d1 = pixelVector.get(i);
+			double d2 = weightVector.get(i);
+			res = d1 * d2;
+			results = res + results;
+		
+		}
+		
+		return results + bias;
+	}
+	
+	public void cleanImages(Images images) {
+		
+		this.images = images;
+	}
+	
+	
+	private double sigmoid(double x) {
+	    return 1 / (1 + Math.exp(-x));
+	}
+
+	public Vector<Double> getPixelVector() {
+		return pixelVector;
+	}
+
+	public void setPixelVector(Vector<Double> pixelVector) {
+		this.pixelVector = pixelVector;
+	}
+
+	public Vector<Double> getWeightVector() {
+		return weightVector;
+	}
+
+	public void setWeightVector(Vector<Double> weightVector) {
+		this.weightVector = weightVector;
+	}
+	
+
+}
